@@ -4,6 +4,8 @@ package "qqq66668/moontiles/sqlite"
 // Values
 pub fn cell_pointers(Bytes, Int, PageHeader) -> Result[Array[Int], String]
 
+pub fn decode_record(Bytes) -> Result[Array[RecordValue], String]
+
 pub fn header_size() -> Int
 
 pub fn page_header_start(Int, DbHeader) -> Int
@@ -59,6 +61,12 @@ pub struct RecordHeader {
   types : Array[SerialType]
   header_length : Int
   payload_offset : Int
+}
+
+pub struct RecordValue {
+  kind : Int
+  int_value : Int64
+  bytes : Bytes
 }
 
 pub struct SerialType {

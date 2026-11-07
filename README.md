@@ -160,3 +160,20 @@ SQLite 把一行存成一条记录：先是变长整数的头长度，再是每�
 ```moonbit
 let header = @sqlite.parse_record_header(payload)
 ```
+
+## 记录取值
+
+解析记录头之后即可逐列取值：整数按大端补码还原，文本与二进制取出原始字节，空值为 kind 0。
+
+| 函数 | 说明 |
+| --- | --- |
+| decode_record(payload) | 返回 Array[RecordValue]，kind 表示空值/整数/文本/二进制 |
+
+```moonbit
+match @sqlite.decode_record(payload) {
+  Ok(values) => println(values.length())
+  Err(msg) => println(msg)
+}
+```
+
+浮点列暂未解码，遇到时返回明确错误而不是给出错误数值。
