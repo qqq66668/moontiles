@@ -221,3 +221,20 @@ let cells = @sqlite.read_leaf_table_cells(bytes, 100, 512)
 let db = @sqlite.parse_db_header(bytes)
 let rows = @sqlite.read_table_rows(bytes, db, 2)
 ```
+
+## MBTiles
+
+MBTiles 是 SQLite 数据库：schema 里记录两张表的根页号，元数据表存键值对，瓦片表存瓦片。
+
+| 函数 | 说明 |
+| --- | --- |
+| Mbtiles::from_bytes(bytes) | 解析数据库并定位 metadata 与 tiles 根页 |
+| metadata_pairs() | 读出全部元数据键值对 |
+| metadata(key) | 按键取值，缺失返回 None |
+
+```moonbit
+match @mbtiles.Mbtiles::from_bytes(bytes) {
+  Ok(file) => println(file.metadata_root())
+  Err(msg) => println(msg)
+}
+```
