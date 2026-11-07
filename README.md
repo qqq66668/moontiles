@@ -20,7 +20,7 @@
 | 瓦片坐标 | 已完成 | 经纬度与 z/x/y 互转、瓦片边界与中心 |
 | SQLite 只读层 | 已完成 | 文件头、按页读取、B 树页头与单元、记录头与列值（含浮点）、溢出页、表遍历 |
 | MBTiles | 已完成 | 元数据键值对、按 z/x/y 取瓦片（自动处理 TMS 行号） |
-| GeoPackage | 未实现 | 规划中，复用同一 SQLite 层 |
+| 记录层完整性 | 已完成 | 浮点列按 IEEE754 还原，记录正文跨页时走溢出页链 |
 
 ## 安装
 
@@ -28,6 +28,17 @@
 moon add qqq66668/moontiles
 ```
 
+
+在 `moon.pkg` 里声明依赖（MoonBit 的 import 写在 `moon.pkg`，不写在 `.mbt` 文件里）：
+
+```
+import {
+  "qqq66668/moontiles/pmtiles",
+  "qqq66668/moontiles/mbtiles",
+  "qqq66668/moontiles/tilemath",
+  "qqq66668/moontiles/sqlite",
+}
+```
 ## 快速开始
 
 读 PMTiles：
@@ -79,6 +90,11 @@ moon test --target js
 
 当前 101 个用例，覆盖头部校验、目录解码、tile_id、取瓦片、gzip 错误、SQLite 页与记录（含浮点与溢出页）、MBTiles 元数据与瓦片。复测：`moon test --target wasm-gc` 看 `Total tests` 一行。
 
+
+## 后续计划
+
+- GeoPackage 1.4 瓦片表读取（复用同一 SQLite 层）。
+- 记录正文跨多级内部页的更大表遍历压力测试。
 ## 已知限制
 
 - 只读：不写 PMTiles、MBTiles 或 SQLite 文件。
