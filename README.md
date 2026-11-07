@@ -96,3 +96,29 @@ Apache-2.0。
 - gzip 解压复用 moonbit-community/flate（Apache-2.0），未在本库重复实现 DEFLATE。
 
 本库按公开规范自行实现，未移植上述项目的源代码；参考实现仅用于测试期对拍。
+
+## 变异测试
+
+`tools/mutation_check.py` 在临时副本上把四处关键判断改错，确认测试会变红：
+
+```bash
+python tools/mutation_check.py
+```
+
+输出 `all 4 mutations were detected` 表示四处判据都有判别力；片段找不到会被记为存活变异而不是通过。CI 也会跑这一步。
+
+## 开发回顾
+
+**边界与结构**：按容器层级拆成 `tilemath`（坐标与编号）、`pmtiles`（容器）、`sqlite`（存储）、`mbtiles`（容器之上的一层）。每一层只依赖下一层，SQLite 层可以独立用于任何 SQLite 文件。
+
+**关键取舍**：
+
+- gzip 解压不自己实现，复用生态里成熟的 `moonbit-community/flate`，把范围收敛到容器解析本身。
+- 目录解码按规范的列式布局实现；偏移列 0 表示紧邻上一项、非 0 表示绝对偏移加一，这条规则来自规范与参考实现源码核对，不是猜测。
+- 记录正文超过单页时走溢出页链，而不是直接拒绝，避免把合法文件判为非法。
+
+**验证方式**：测试素材全部由独立来源产生——PMTiles 用参考实现 `pmtiles` 3.8.1 生成与对拍，SQLite/MBTiles 用 Python 标准库 `sqlite3` 真实写库后读出；另用 `tools/mutation_check.py` 证明判据有判别力。
+
+**AI 参与范围**：实现与测试在 AI 辅助下完成；规范条款、字段偏移与参考实现行为均以实际运行结果核对，不采信记忆；所有对外数字都用仓库内命令复测。
+
+**参考来源**：PMTiles 规范、MBTiles 1.3 规范、SQLite 文件格式文档、moonbit-community/flate（Apache-2.0）。未移植上述项目的源代码。

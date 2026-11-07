@@ -29,3 +29,7 @@ jobs:
         run: moon test --target wasm-gc
       - name: Test js
         run: moon test --target js
+      - name: Test native
+        run: moon test --target native
+      - name: Mutation check
+        run: python3 tools/mutation_check.py
