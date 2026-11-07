@@ -1,0 +1,48 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "qqq66668/moontiles/pmtiles"
+
+// Values
+pub fn compression_name(Int) -> String
+
+pub fn header_size() -> Int
+
+pub fn parse_header(Bytes) -> Result[Header, String]
+
+pub fn tile_type_name(Int) -> String
+
+pub fn u64_from_int(Int) -> UInt64
+
+// Errors
+
+// Types and methods
+pub struct Header {
+  spec_version : Int
+  root_dir_offset : UInt64
+  root_dir_length : UInt64
+  metadata_offset : UInt64
+  metadata_length : UInt64
+  leaf_dir_offset : UInt64
+  leaf_dir_length : UInt64
+  tile_data_offset : UInt64
+  tile_data_length : UInt64
+  addressed_tiles_count : UInt64
+  tile_entries_count : UInt64
+  tile_contents_count : UInt64
+  clustered : Bool
+  internal_compression : Int
+  tile_compression : Int
+  tile_type : Int
+  min_zoom : Int
+  max_zoom : Int
+  min_lon_e7 : Int
+  min_lat_e7 : Int
+  max_lon_e7 : Int
+  max_lat_e7 : Int
+  center_zoom : Int
+  center_lon_e7 : Int
+  center_lat_e7 : Int
+}
+
+// Type aliases
+
+// Traits

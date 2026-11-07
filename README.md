@@ -62,3 +62,21 @@ tilemath 包：
 let t = @tilemath.lnglat_to_tile(12, @tilemath.LngLat::new(116.3975, 39.9087))
 // t.x = 3372, t.y = 1552
 ```
+
+## pmtiles 包
+
+| 函数 | 说明 |
+| --- | --- |
+| header_size() | 头部长度，固定 127 |
+| parse_header(Bytes) | 解析并校验 v3 头部，返回 Result |
+| compression_name / tile_type_name | 枚举编号转名字 |
+| u64_from_int(Int) | 整数提升为 64 位 |
+
+示例：
+
+```moonbit
+match @pmtiles.parse_header(bytes) {
+  Ok(h) => println(h.tile_data_offset)
+  Err(e) => println(e)
+}
+```
