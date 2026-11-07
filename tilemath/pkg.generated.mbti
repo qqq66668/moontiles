@@ -10,9 +10,15 @@ pub fn tile_center(TileXYZ) -> LngLat
 
 pub fn tile_count(Int) -> Int
 
+pub fn tile_id(Int, Int, Int) -> UInt64
+
+pub fn tile_id_of(TileXYZ) -> UInt64
+
 pub fn tile_north_west(TileXYZ) -> LngLat
 
 pub fn tile_south_east(TileXYZ) -> LngLat
+
+pub fn u64_from_int(Int) -> UInt64
 
 // Errors
 

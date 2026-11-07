@@ -94,3 +94,19 @@ match @pmtiles.parse_header(bytes) {
 目录解码与参考实现 pmtiles 3.8.1 对拍：fixture 按规范编码后交给参考实现解码，四列（tile_id / offset / length / run_length）逐项一致。
 
 offset 列规则：值为 0 表示与上一项数据紧邻（上一项 offset + length）；非 0 表示该值为绝对偏移加一。
+
+## tile_id
+
+PMTiles v3 的瓦片编号 = 之前所有级别的瓦片数 + 本级别 Hilbert 曲线序号：
+
+moonbit
+let id = @tilemath.tile_id(12, 3372, 1552)
+
+97 组 (z, x, y) 的编号与参考实现 pmtiles 3.8.1 的 zxy_to_tileid 逐项一致。
+## 目录查找
+
+| 函数 | 说明 |
+| --- | --- |
+| find_entry(entries, target) | 二分查找；命中返回 offset/length |
+| is_leaf = true | 该条目指向叶目录，需解压后递归查找 |
+| None | 目录为空或目标超出区间 |
