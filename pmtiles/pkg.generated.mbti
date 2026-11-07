@@ -4,6 +4,10 @@ package "qqq66668/moontiles/pmtiles"
 // Values
 pub fn compression_name(Int) -> String
 
+pub fn decode_entries(Bytes) -> Result[Array[Entry], String]
+
+pub fn expand_runs(Array[Entry]) -> Array[TileRef]
+
 pub fn header_size() -> Int
 
 pub fn parse_header(Bytes) -> Result[Header, String]
@@ -15,6 +19,13 @@ pub fn u64_from_int(Int) -> UInt64
 // Errors
 
 // Types and methods
+pub struct Entry {
+  tile_id : UInt64
+  offset : UInt64
+  length : UInt64
+  run_length : UInt64
+}
+
 pub struct Header {
   spec_version : Int
   root_dir_offset : UInt64
@@ -41,6 +52,17 @@ pub struct Header {
   center_zoom : Int
   center_lon_e7 : Int
   center_lat_e7 : Int
+}
+
+pub struct TileRef {
+  tile_id : UInt64
+  offset : UInt64
+  length : UInt64
+}
+
+pub struct Varint {
+  value : UInt64
+  next : Int
 }
 
 // Type aliases

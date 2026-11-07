@@ -80,3 +80,12 @@ match @pmtiles.parse_header(bytes) {
   Err(e) => println(e)
 }
 ```
+
+## 目录解码
+
+| 函数 | 说明 |
+| --- | --- |
+| decode_entries(Bytes) | 解析已解压目录，返回 Result[Array[Entry], String] |
+| expand_runs(Array[Entry]) | 展开 run-length 得到逐瓦片引用 |
+
+目录项字段均为 LEB128 变长整数：tile_id 增量、run_length、length、offset 增量。
