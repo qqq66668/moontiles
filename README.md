@@ -177,3 +177,19 @@ match @sqlite.decode_record(payload) {
 ```
 
 浮点列暂未解码，遇到时返回明确错误而不是给出错误数值。
+
+## 元数据
+
+PMTiles 的元数据块按 gzip 压缩，读取时按 header 的偏移与长度截取后解压。
+
+| 函数 | 说明 |
+| --- | --- |
+| metadata() | 返回元数据 JSON 的原始字节 |
+| metadata_text() | 解码为 UTF-8 文本，非法编码返回错误 |
+
+```moonbit
+match file.metadata_text() {
+  Ok(json) => println(json)
+  Err(msg) => println(msg)
+}
+```

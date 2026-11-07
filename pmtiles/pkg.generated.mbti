@@ -83,6 +83,8 @@ pub struct PmtilesFile {
 }
 pub fn PmtilesFile::from_bytes(Bytes) -> Result[Self, String]
 pub fn PmtilesFile::header(Self) -> Header
+pub fn PmtilesFile::metadata(Self) -> Result[Bytes, String]
+pub fn PmtilesFile::metadata_text(Self) -> Result[String, String]
 pub fn PmtilesFile::root_entry_count(Self) -> Int
 pub fn PmtilesFile::tile(Self, Int, Int, Int) -> Result[Bytes?, String]
 

@@ -1,4 +1,5 @@
 import {
   "moonbit-community/flate/gzip",
+  "moonbitlang/core/encoding/utf8",
   "qqq66668/moontiles/tilemath",
 }
