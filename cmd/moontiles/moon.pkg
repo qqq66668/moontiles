@@ -1,4 +1,5 @@
 import {
+  "qqq66668/moontiles/mbtiles",
   "qqq66668/moontiles/pmtiles",
 }
 

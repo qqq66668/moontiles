@@ -80,6 +80,13 @@ moon run cmd/moontiles --target wasm-gc
 - 目录解码：按规范编码的 fixture 交给参考实现解码，tile_id / offset / length / run_length 四列逐项一致。
 - SQLite 与 MBTiles：fixture 由 Python 标准库 sqlite3 写出，文件头、页头、记录头与元数据键值对逐项断言。
 
+
+## 演示视频
+
+37 秒演示：读 PMTiles 与 MBTiles、双后端测试、变异测试。视频由真实命令输出渲染而成，脚本可复现。
+
+- 视频：[docs/demo.mp4](docs/demo.mp4)
+- 脚本与时间轴：[docs/demo.md](docs/demo.md)
 ## 测试
 
 ```bash
