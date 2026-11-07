@@ -22,6 +22,15 @@ pub struct RecordHeader {
 }
 
 ///|
+/// 记录中一列的值：kind 0 空值、1 整数、2 浮点、3 文本、4 二进制。
+pub struct RecordValue {
+  kind : Int32
+  int_value : Int64
+  real_value : Double
+  bytes : Bytes
+}
+
+///|
 /// serial type 对应的内容类别：0 空值、1 整数、2 浮点、3 文本、4 二进制。
 pub fn serial_kind(serial_type : Int32) -> Int32 {
   if serial_type == 0 {
@@ -90,8 +99,7 @@ pub fn read_varint(data : Bytes, start : Int32) -> Result[Varint, String] {
   if done == false {
     return Err("sqlite: varint is truncated")
   }
-  let out : Varint = { value, next: index, }
-  Ok(out)
+  Ok({ value, next: index, })
 }
 
 ///|
@@ -117,21 +125,111 @@ pub fn parse_record_header(data : Bytes) -> Result[RecordHeader, String] {
     if length < 0 {
       return Err("sqlite: reserved serial type in record header")
     }
-    let entry : SerialType = {
+    types.push({
       serial_type,
       kind: serial_kind(serial_type),
       byte_length: length,
-    }
-    types.push(entry)
+    })
     pos = item.next
   }
   if pos != header_length {
     return Err("sqlite: record header length does not match its serial types")
   }
-  let header : RecordHeader = {
-    types,
-    header_length,
-    payload_offset: header_length,
+  Ok({ types, header_length, payload_offset: header_length, })
+}
+
+///|
+/// 复制一段字节，供文本与二进制列取值使用。
+pub fn copy_bytes(data : Bytes, start : Int32, len : Int32) -> Bytes {
+  let buf = Buffer()
+  let mut i = 0
+  while i < len {
+    buf.write_byte(data.unsafe_get(start + i))
+    i = i + 1
   }
-  Ok(header)
+  buf.to_bytes()
+}
+
+///|
+/// 按大端读取 IEEE754 双精度浮点。
+fn read_double_be(data : Bytes, start : Int32) -> Double {
+  let mut bits = (0).to_uint64()
+  let mut i = 0
+  while i < 8 {
+    bits = bits * (256).to_uint64() +
+      data.unsafe_get(start + i).to_int().to_uint64()
+    i = i + 1
+  }
+  bits.reinterpret_as_double()
+}
+
+///|
+/// 按大端补码读取有符号整数，length 最大 8 字节。
+fn read_signed_be(data : Bytes, start : Int32, len : Int32) -> Int64 {
+  let mut value = Int64::from_int(0)
+  let mut i = 0
+  while i < len {
+    value = value * Int64::from_int(256) +
+      Int64::from_int(data.unsafe_get(start + i).to_int())
+    i = i + 1
+  }
+  if len > 0 && len < 8 {
+    if data.unsafe_get(start).to_int() >= 128 {
+      let mut power = Int64::from_int(1)
+      let mut k = 0
+      while k < len {
+        power = power * Int64::from_int(256)
+        k = k + 1
+      }
+      value = value - power
+    }
+  }
+  value
+}
+
+///|
+/// 按记录头逐列取值；整数按补码还原，浮点按 IEEE754 还原，
+/// 文本与二进制取出原始字节。
+pub fn decode_record(data : Bytes) -> Result[Array[RecordValue], String] {
+  let header = match parse_record_header(data) {
+    Ok(h) => h
+    Err(msg) => return Err(msg)
+  }
+  let types = header.types
+  let values : Array[RecordValue] = []
+  let mut pos = header.payload_offset
+  let mut i = 0
+  while i < types.length() {
+    let t = types[i]
+    let kind = t.kind
+    let mut int_value = Int64::from_int(0)
+    let mut real_value = 0.0
+    let mut raw : Bytes = b""
+    if kind == 1 {
+      if t.serial_type == 8 {
+        int_value = Int64::from_int(0)
+      } else if t.serial_type == 9 {
+        int_value = Int64::from_int(1)
+      } else {
+        if pos + t.byte_length > data.length() {
+          return Err("sqlite: integer value is truncated")
+        }
+        int_value = read_signed_be(data, pos, t.byte_length)
+      }
+    } else if kind == 2 {
+      if pos + 8 > data.length() {
+        return Err("sqlite: real value is truncated")
+      }
+      real_value = read_double_be(data, pos)
+    } else if kind == 3 || kind == 4 {
+      if pos + t.byte_length > data.length() {
+        return Err("sqlite: text or blob value is truncated")
+      }
+      raw = copy_bytes(data, pos, t.byte_length)
+    }
+    values.push({ kind, int_value, real_value, bytes: raw, })
+    pos = pos + t.byte_length
+    i = i + 1
+  }
+  Ok(values)
 }
