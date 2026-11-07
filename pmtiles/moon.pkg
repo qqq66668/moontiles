@@ -1,3 +1,4 @@
 import {
   "moonbit-community/flate/gzip",
+  "qqq66668/moontiles/tilemath",
 }

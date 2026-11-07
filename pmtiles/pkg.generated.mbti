@@ -18,9 +18,13 @@ pub fn header_size() -> Int
 
 pub fn parse_header(Bytes) -> Result[Header, String]
 
+pub fn slice_bytes(Bytes, Int, Int) -> Result[Bytes, String]
+
 pub fn tile_type_name(Int) -> String
 
 pub fn u64_from_int(Int) -> UInt64
+
+pub fn u64_to_int(UInt64) -> Int
 
 // Errors
 
@@ -71,6 +75,16 @@ pub struct Header {
   center_lon_e7 : Int
   center_lat_e7 : Int
 }
+
+pub struct PmtilesFile {
+  data : Bytes
+  header : Header
+  root : Array[Entry]
+}
+pub fn PmtilesFile::from_bytes(Bytes) -> Result[Self, String]
+pub fn PmtilesFile::header(Self) -> Header
+pub fn PmtilesFile::root_entry_count(Self) -> Int
+pub fn PmtilesFile::tile(Self, Int, Int, Int) -> Result[Bytes?, String]
 
 pub struct TileRef {
   tile_id : UInt64
