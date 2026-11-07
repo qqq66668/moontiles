@@ -207,3 +207,17 @@ match file.metadata_text() {
 ```moonbit
 let cells = @sqlite.read_leaf_table_cells(bytes, 100, 512)
 ```
+
+## 表遍历
+
+从根页递归遍历内部页与叶子页，读出整表；配合记录解析即可拿到每行每列。
+
+| 函数 | 说明 |
+| --- | --- |
+| read_table_rows(data, db, root_page) | 返回每行的记录正文 |
+| read_table_values(data, db, root_page) | 返回每行解析后的列值 |
+
+```moonbit
+let db = @sqlite.parse_db_header(bytes)
+let rows = @sqlite.read_table_rows(bytes, db, 2)
+```
