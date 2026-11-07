@@ -1,0 +1,37 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "qqq66668/moontiles/sqlite"
+
+// Values
+pub fn header_size() -> Int
+
+pub fn parse_db_header(Bytes) -> Result[DbHeader, String]
+
+pub fn read_page(Bytes, DbHeader, Int) -> Result[Bytes, String]
+
+// Errors
+
+// Types and methods
+pub struct DbHeader {
+  page_size : Int
+  write_version : Int
+  read_version : Int
+  reserved_bytes : Int
+  max_payload_fraction : Int
+  min_payload_fraction : Int
+  leaf_payload_fraction : Int
+  page_count : Int
+  freelist_trunk_page : Int
+  freelist_page_count : Int
+  schema_cookie : Int
+  schema_format : Int
+  default_cache_size : Int
+  largest_root_page : Int
+  text_encoding : Int
+  user_version : Int
+  incremental_vacuum : Int
+  application_id : Int
+}
+
+// Type aliases
+
+// Traits
