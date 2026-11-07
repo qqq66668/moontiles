@@ -113,3 +113,47 @@ pub fn Mbtiles::metadata(
   }
   Ok(None)
 }
+
+///|
+/// 按 z/x/y 取瓦片；MBTiles 的行号是 TMS 约定，需要用 2^z - 1 - y 换算。
+///
+/// 找不到对应瓦片时返回 None，表结构不符时返回错误说明。
+pub fn Mbtiles::tile(
+  self : Mbtiles,
+  z : Int32,
+  x : Int32,
+  y : Int32,
+) -> Result[Bytes?, String] {
+  let rows = match
+    @sqlite.read_table_values(self.data, self.db, self.tiles_root) {
+    Ok(r) => r
+    Err(msg) => return Err(msg)
+  }
+  let n = 1 << z
+  let tms_row = n - 1 - y
+  let mut i = 0
+  while i < rows.length() {
+    let values = rows[i]
+    if values.length() >= 4 {
+      let zz = values[0].int_value.to_int()
+      let xx = values[1].int_value.to_int()
+      let yy = values[2].int_value.to_int()
+      if zz == z && xx == x && yy == tms_row {
+        return Ok(Some(values[3].bytes))
+      }
+    }
+    i = i + 1
+  }
+  Ok(None)
+}
+
+///|
+/// 瓦片表中的行数。
+pub fn Mbtiles::tile_row_count(self : Mbtiles) -> Result[Int32, String] {
+  let rows = match
+    @sqlite.read_table_values(self.data, self.db, self.tiles_root) {
+    Ok(r) => r
+    Err(msg) => return Err(msg)
+  }
+  Ok(rows.length())
+}

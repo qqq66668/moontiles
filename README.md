@@ -238,3 +238,19 @@ match @mbtiles.Mbtiles::from_bytes(bytes) {
   Err(msg) => println(msg)
 }
 ```
+
+## 取瓦片（MBTiles）
+
+MBTiles 的行号是 TMS 约定（自南向北），换取时用 2^z - 1 - y 换算。
+
+| 函数 | 说明 |
+| --- | --- |
+| tile(z, x, y) | 返回瓦片字节，缺失返回 None |
+| tile_row_count() | 瓦片表行数 |
+
+```moonbit
+match file.tile(0, 0, 0) {
+  Ok(found) => println(found)
+  Err(msg) => println(msg)
+}
+```

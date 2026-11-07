@@ -20,6 +20,8 @@ pub fn Mbtiles::from_bytes(Bytes) -> Result[Self, String]
 pub fn Mbtiles::metadata(Self, String) -> Result[String?, String]
 pub fn Mbtiles::metadata_pairs(Self) -> Result[Array[(String, String)], String]
 pub fn Mbtiles::metadata_root(Self) -> Int
+pub fn Mbtiles::tile(Self, Int, Int, Int) -> Result[Bytes?, String]
+pub fn Mbtiles::tile_row_count(Self) -> Result[Int, String]
 pub fn Mbtiles::tiles_root(Self) -> Int
 
 // Type aliases
