@@ -121,3 +121,13 @@ PMTiles 的目录块与元数据块按 gzip 压缩，读取时需先解压。
 | decode_directory(Bytes) | 解压后按列式布局解析目录 |
 
 解压复用 moonbit-community/flate 的 gzip 包，不在本库重复实现 DEFLATE。
+
+## 运行示例
+
+命令行示例内置一段真实结构的 v3 样例数据，直接解析并打印头部、根目录与瓦片摘要：
+
+```bash
+moon run cmd/moontiles --target wasm-gc
+```
+
+wasm-gc 与 native 均可运行，不依赖任何外部文件。

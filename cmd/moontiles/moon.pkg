@@ -1,0 +1,5 @@
+import {
+  "qqq66668/moontiles/pmtiles",
+}
+
+pkgtype(kind: "executable")
