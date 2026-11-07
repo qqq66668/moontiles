@@ -1,0 +1,35 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "qqq66668/moontiles/tilemath"
+
+// Values
+pub fn lnglat_to_tile(Int, LngLat) -> TileXYZ
+
+pub fn max_latitude() -> Double
+
+pub fn tile_center(TileXYZ) -> LngLat
+
+pub fn tile_count(Int) -> Int
+
+pub fn tile_north_west(TileXYZ) -> LngLat
+
+pub fn tile_south_east(TileXYZ) -> LngLat
+
+// Errors
+
+// Types and methods
+pub struct LngLat {
+  lng : Double
+  lat : Double
+}
+pub fn LngLat::new(Double, Double) -> Self
+
+pub struct TileXYZ {
+  z : Int
+  x : Int
+  y : Int
+}
+pub fn TileXYZ::new(Int, Int, Int) -> Self
+
+// Type aliases
+
+// Traits

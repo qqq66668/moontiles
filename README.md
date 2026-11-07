@@ -44,3 +44,21 @@ moon add qqq66668/moontiles
 ## 许可
 
 Apache-2.0
+
+## 已实现 API
+
+tilemath 包：
+
+| 函数 | 说明 |
+| --- | --- |
+| tile_count(z) | 单轴瓦片数 2^z |
+| max_latitude() | Web Mercator 纬度上限 |
+| lnglat_to_tile(z, LngLat) | 经纬度换算为 TileXYZ |
+| tile_north_west / tile_south_east / tile_center | 瓦片角点与中心 |
+
+示例：
+
+```moonbit
+let t = @tilemath.lnglat_to_tile(12, @tilemath.LngLat::new(116.3975, 39.9087))
+// t.x = 3372, t.y = 1552
+```
