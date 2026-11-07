@@ -146,3 +146,17 @@ SQLite 把表与索引存成 B 树页；读取单元前需要先解析页头与�
 let start = @sqlite.page_header_start(1, db)
 let page = @sqlite.parse_page_header(bytes, start)
 ```
+
+## 记录头
+
+SQLite 把一行存成一条记录：先是变长整数的头长度，再是每列的 serial type，随后是各列正文。
+
+| 函数 | 说明 |
+| --- | --- |
+| read_varint(data, start) | 读取 1 到 9 字节的变长整数 |
+| serial_kind / serial_byte_length | serial type 对应的类别与字节数 |
+| parse_record_header(data) | 解析每列 serial type、头长度与正文起点 |
+
+```moonbit
+let header = @sqlite.parse_record_header(payload)
+```

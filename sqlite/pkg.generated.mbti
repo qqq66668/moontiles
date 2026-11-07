@@ -12,7 +12,15 @@ pub fn parse_db_header(Bytes) -> Result[DbHeader, String]
 
 pub fn parse_page_header(Bytes, Int) -> Result[PageHeader, String]
 
+pub fn parse_record_header(Bytes) -> Result[RecordHeader, String]
+
 pub fn read_page(Bytes, DbHeader, Int) -> Result[Bytes, String]
+
+pub fn read_varint(Bytes, Int) -> Result[Varint, String]
+
+pub fn serial_byte_length(Int) -> Int
+
+pub fn serial_kind(Int) -> Int
 
 // Errors
 
@@ -45,6 +53,23 @@ pub struct PageHeader {
   cell_content_start : Int
   fragmented_free_bytes : Int
   header_size : Int
+}
+
+pub struct RecordHeader {
+  types : Array[SerialType]
+  header_length : Int
+  payload_offset : Int
+}
+
+pub struct SerialType {
+  serial_type : Int
+  kind : Int
+  byte_length : Int
+}
+
+pub struct Varint {
+  value : Int64
+  next : Int
 }
 
 // Type aliases
