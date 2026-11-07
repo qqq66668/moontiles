@@ -8,6 +8,8 @@ pub fn decode_entries(Bytes) -> Result[Array[Entry], String]
 
 pub fn expand_runs(Array[Entry]) -> Array[TileRef]
 
+pub fn find_entry(Array[Entry], UInt64) -> FoundTile?
+
 pub fn header_size() -> Int
 
 pub fn parse_header(Bytes) -> Result[Header, String]
@@ -29,6 +31,13 @@ pub struct Entry {
   offset : UInt64
   length : UInt64
   run_length : UInt64
+}
+pub fn Entry::new(UInt64, UInt64, UInt64, UInt64) -> Self
+
+pub struct FoundTile {
+  offset : UInt64
+  length : UInt64
+  is_leaf : Bool
 }
 
 pub struct Header {
