@@ -110,3 +110,14 @@ let id = @tilemath.tile_id(12, 3372, 1552)
 | find_entry(entries, target) | 二分查找；命中返回 offset/length |
 | is_leaf = true | 该条目指向叶目录，需解压后递归查找 |
 | None | 目录为空或目标超出区间 |
+
+## 压缩目录
+
+PMTiles 的目录块与元数据块按 gzip 压缩，读取时需先解压。
+
+| 函数 | 说明 |
+| --- | --- |
+| gunzip(Bytes) | 解压 gzip 数据，失败返回错误说明 |
+| decode_directory(Bytes) | 解压后按列式布局解析目录 |
+
+解压复用 moonbit-community/flate 的 gzip 包，不在本库重复实现 DEFLATE。

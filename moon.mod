@@ -13,3 +13,7 @@ keywords = [ "pmtiles", "mbtiles", "geopackage", "gis", "map-tiles", "hilbert" ]
 preferred_target = "wasm-gc"
 
 description = "Pure MoonBit tile container toolkit: PMTiles v3, MBTiles 1.3 and GeoPackage tile tables."
+
+import {
+  "moonbit-community/flate@0.10.0",
+}

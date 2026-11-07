@@ -4,11 +4,15 @@ package "qqq66668/moontiles/pmtiles"
 // Values
 pub fn compression_name(Int) -> String
 
+pub fn decode_directory(Bytes) -> Result[Array[Entry], String]
+
 pub fn decode_entries(Bytes) -> Result[Array[Entry], String]
 
 pub fn expand_runs(Array[Entry]) -> Array[TileRef]
 
 pub fn find_entry(Array[Entry], UInt64) -> FoundTile?
+
+pub fn gunzip(Bytes) -> Result[Bytes, String]
 
 pub fn header_size() -> Int
 
