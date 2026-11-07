@@ -131,3 +131,18 @@ moon run cmd/moontiles --target wasm-gc
 ```
 
 wasm-gc 与 native 均可运行，不依赖任何外部文件。
+
+## B 树页
+
+SQLite 把表与索引存成 B 树页；读取单元前需要先解析页头与单元指针数组。
+
+| 函数 | 说明 |
+| --- | --- |
+| page_header_start(page_no, db) | 页头在文件中的偏移，第 1 页在 100 字节头之后 |
+| parse_page_header(data, start) | 解析页类型、单元数、内容区起点、碎片字节 |
+| cell_pointers(data, start, page) | 读出单元指针数组，越界返回错误 |
+
+```moonbit
+let start = @sqlite.page_header_start(1, db)
+let page = @sqlite.parse_page_header(bytes, start)
+```

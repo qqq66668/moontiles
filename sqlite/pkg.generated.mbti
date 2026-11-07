@@ -2,9 +2,15 @@
 package "qqq66668/moontiles/sqlite"
 
 // Values
+pub fn cell_pointers(Bytes, Int, PageHeader) -> Result[Array[Int], String]
+
 pub fn header_size() -> Int
 
+pub fn page_header_start(Int, DbHeader) -> Int
+
 pub fn parse_db_header(Bytes) -> Result[DbHeader, String]
+
+pub fn parse_page_header(Bytes, Int) -> Result[PageHeader, String]
 
 pub fn read_page(Bytes, DbHeader, Int) -> Result[Bytes, String]
 
@@ -30,6 +36,15 @@ pub struct DbHeader {
   user_version : Int
   incremental_vacuum : Int
   application_id : Int
+}
+
+pub struct PageHeader {
+  page_type : Int
+  first_freeblock : Int
+  cell_count : Int
+  cell_content_start : Int
+  fragmented_free_bytes : Int
+  header_size : Int
 }
 
 // Type aliases
