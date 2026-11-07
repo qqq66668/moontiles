@@ -59,12 +59,11 @@ fn demo_mbtiles() -> Unit {
       }
       match file.metadata("format") {
         Err(msg) => println(msg)
-        Ok(found) => {
+        Ok(found) =>
           match found {
             Some(v) => println("format=" + v)
             None => println("format missing")
           }
-        }
       }
       match file.tile_row_count() {
         Err(msg) => println(msg)
@@ -72,12 +71,11 @@ fn demo_mbtiles() -> Unit {
       }
       match file.tile(0, 0, 0) {
         Err(msg) => println(msg)
-        Ok(found) => {
+        Ok(found) =>
           match found {
             Some(bytes) => report("tile length", bytes.length())
             None => println("tile missing")
           }
-        }
       }
     }
   }
