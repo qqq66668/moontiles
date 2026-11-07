@@ -2,6 +2,8 @@
 package "qqq66668/moontiles/sqlite"
 
 // Values
+pub fn cell_payload(Bytes, TableCell) -> Bytes
+
 pub fn cell_pointers(Bytes, Int, PageHeader) -> Result[Array[Int], String]
 
 pub fn decode_record(Bytes) -> Result[Array[RecordValue], String]
@@ -15,6 +17,10 @@ pub fn parse_db_header(Bytes) -> Result[DbHeader, String]
 pub fn parse_page_header(Bytes, Int) -> Result[PageHeader, String]
 
 pub fn parse_record_header(Bytes) -> Result[RecordHeader, String]
+
+pub fn parse_table_cell(Bytes, Int, Int, Int) -> Result[TableCell, String]
+
+pub fn read_leaf_table_cells(Bytes, Int, Int) -> Result[Array[TableCell], String]
 
 pub fn read_page(Bytes, DbHeader, Int) -> Result[Bytes, String]
 
@@ -73,6 +79,12 @@ pub struct SerialType {
   serial_type : Int
   kind : Int
   byte_length : Int
+}
+
+pub struct TableCell {
+  row_id : Int64
+  payload_offset : Int
+  payload_length : Int
 }
 
 pub struct Varint {

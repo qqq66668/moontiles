@@ -193,3 +193,17 @@ match file.metadata_text() {
   Err(msg) => println(msg)
 }
 ```
+
+## 表页读取
+
+叶子表页里每个单元是「记录正文长度 + 行号 + 记录正文」；读出单元即可拿到整行。
+
+| 函数 | 说明 |
+| --- | --- |
+| read_leaf_table_cells(data, page_start, page_size) | 遍历叶子表页的全部单元 |
+| cell_payload(data, cell) | 取出单元的记录正文副本 |
+| parse_table_cell(...) | 解析单个单元，越界返回错误 |
+
+```moonbit
+let cells = @sqlite.read_leaf_table_cells(bytes, 100, 512)
+```
