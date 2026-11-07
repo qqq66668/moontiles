@@ -6,7 +6,14 @@ pub struct Varint {
 }
 
 ///|
-/// 目录项：tile_id 与 offset 存的是相对前一项的增量。
+/// 条目数这类小整数使用 32 位读取。
+pub struct CountVarint {
+  value : Int32
+  next : Int32
+}
+
+///|
+/// 目录项：tile_id 与 offset 均为绝对值。
 pub struct Entry {
   tile_id : UInt64
   offset : UInt64
@@ -59,40 +66,125 @@ fn read_varint(data : Bytes, start : Int32) -> Result[Varint, String] {
 }
 
 ///|
-/// 解析已解压的目录字节；每项依次是 tile_id 增量、run_length、length、offset 增量。
+/// 读取条目数：最多 5 字节，负值视为非法。
+fn read_count_varint(
+  data : Bytes,
+  start : Int32,
+) -> Result[CountVarint, String] {
+  let mut value = 0
+  let mut index = start
+  let mut count = 0
+  let mut done = false
+  let mut too_long = false
+  while done == false && index < data.length() {
+    if count >= 5 {
+      too_long = true
+      done = true
+    } else {
+      let byte = data.unsafe_get(index).to_int()
+      index = index + 1
+      let high = byte / 128
+      let low = byte - high * 128
+      value = value + (low << (7 * count))
+      count = count + 1
+      if high == 0 {
+        done = true
+      }
+    }
+  }
+  if too_long {
+    return Err("pmtiles: entry count varint is longer than 5 bytes")
+  }
+  if done == false {
+    return Err("pmtiles: truncated entry count")
+  }
+  if value < 0 {
+    return Err("pmtiles: entry count is negative")
+  }
+  let result : CountVarint = { value, next: index, }
+  Ok(result)
+}
+
+///|
+/// 解析已解压的目录字节。规范为列式布局：
+/// 条目数、tile_id 增量列、run_length 列、length 列、offset 列。
+///
+/// offset 列：0 表示与上一项数据紧邻（上一项 offset + length），
+/// 非 0 表示该值是绝对偏移加一。
 pub fn decode_entries(data : Bytes) -> Result[Array[Entry], String] {
-  let entries : Array[Entry] = []
-  let mut index = 0
+  let count_r = match read_count_varint(data, 0) {
+    Ok(r) => r
+    Err(msg) => return Err(msg)
+  }
+  let count = count_r.value
+  let ids : Array[UInt64] = []
+  let runs : Array[UInt64] = []
+  let lengths : Array[UInt64] = []
+  let offsets : Array[UInt64] = []
+  let mut pos = count_r.next
   let mut last_id = u64_from_int(0)
+  let mut i = 0
+  while i < count {
+    let r = match read_varint(data, pos) {
+      Ok(v) => v
+      Err(msg) => return Err(msg)
+    }
+    last_id = last_id + r.value
+    ids.push(last_id)
+    pos = r.next
+    i = i + 1
+  }
+  let mut j = 0
+  while j < count {
+    let r = match read_varint(data, pos) {
+      Ok(v) => v
+      Err(msg) => return Err(msg)
+    }
+    runs.push(r.value)
+    pos = r.next
+    j = j + 1
+  }
+  let mut k = 0
+  while k < count {
+    let r = match read_varint(data, pos) {
+      Ok(v) => v
+      Err(msg) => return Err(msg)
+    }
+    lengths.push(r.value)
+    pos = r.next
+    k = k + 1
+  }
   let mut last_offset = u64_from_int(0)
-  let total = data.length()
-  while index < total {
-    let id_r = match read_varint(data, index) {
-      Ok(r) => r
+  let mut last_length = u64_from_int(0)
+  let mut m = 0
+  while m < count {
+    let r = match read_varint(data, pos) {
+      Ok(v) => v
       Err(msg) => return Err(msg)
     }
-    let run_r = match read_varint(data, id_r.next) {
-      Ok(r) => r
-      Err(msg) => return Err(msg)
+    let mut value = r.value
+    if m > 0 && value == u64_from_int(0) {
+      value = last_offset + last_length
+    } else if value > u64_from_int(0) {
+      value = value - u64_from_int(1)
     }
-    let len_r = match read_varint(data, run_r.next) {
-      Ok(r) => r
-      Err(msg) => return Err(msg)
-    }
-    let off_r = match read_varint(data, len_r.next) {
-      Ok(r) => r
-      Err(msg) => return Err(msg)
-    }
-    last_id = last_id + id_r.value
-    last_offset = last_offset + off_r.value
+    offsets.push(value)
+    last_offset = value
+    last_length = lengths[m]
+    pos = r.next
+    m = m + 1
+  }
+  let entries : Array[Entry] = []
+  let mut n = 0
+  while n < count {
     let entry : Entry = {
-      tile_id: last_id,
-      offset: last_offset,
-      length: len_r.value,
-      run_length: run_r.value,
+      tile_id: ids[n],
+      offset: offsets[n],
+      length: lengths[n],
+      run_length: runs[n],
     }
     entries.push(entry)
-    index = off_r.next
+    n = n + 1
   }
   Ok(entries)
 }

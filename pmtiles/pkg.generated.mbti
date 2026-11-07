@@ -19,6 +19,11 @@ pub fn u64_from_int(Int) -> UInt64
 // Errors
 
 // Types and methods
+pub struct CountVarint {
+  value : Int
+  next : Int
+}
+
 pub struct Entry {
   tile_id : UInt64
   offset : UInt64

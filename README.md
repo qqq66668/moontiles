@@ -89,3 +89,8 @@ match @pmtiles.parse_header(bytes) {
 | expand_runs(Array[Entry]) | 展开 run-length 得到逐瓦片引用 |
 
 目录项字段均为 LEB128 变长整数：tile_id 增量、run_length、length、offset 增量。
+## 与参考实现对拍
+
+目录解码与参考实现 pmtiles 3.8.1 对拍：fixture 按规范编码后交给参考实现解码，四列（tile_id / offset / length / run_length）逐项一致。
+
+offset 列规则：值为 0 表示与上一项数据紧邻（上一项 offset + length）；非 0 表示该值为绝对偏移加一。
