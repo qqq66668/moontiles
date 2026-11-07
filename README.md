@@ -18,7 +18,7 @@
 | PMTiles 元数据 | 已完成 | gzip 解压后返回 JSON 字节或 UTF-8 文本 |
 | 瓦片编号 | 已完成 | Hilbert tile_id，与参考实现逐项一致 |
 | 瓦片坐标 | 已完成 | 经纬度与 z/x/y 互转、瓦片边界与中心 |
-| SQLite 只读层 | 已完成 | 文件头、按页读取、B 树页头与单元、记录头与列值、表遍历 |
+| SQLite 只读层 | 已完成 | 文件头、按页读取、B 树页头与单元、记录头与列值（含浮点）、溢出页、表遍历 |
 | MBTiles | 已完成 | 元数据键值对、按 z/x/y 取瓦片（自动处理 TMS 行号） |
 | GeoPackage | 未实现 | 规划中，复用同一 SQLite 层 |
 
@@ -77,13 +77,11 @@ moon test --target wasm-gc
 moon test --target js
 ```
 
-当前 97 个用例，覆盖头部校验、目录解码、tile_id、取瓦片、gzip 错误、SQLite 页与记录、MBTiles 元数据与瓦片。
+当前 101 个用例，覆盖头部校验、目录解码、tile_id、取瓦片、gzip 错误、SQLite 页与记录（含浮点与溢出页）、MBTiles 元数据与瓦片。复测：`moon test --target wasm-gc` 看 `Total tests` 一行。
 
 ## 已知限制
 
 - 只读：不写 PMTiles、MBTiles 或 SQLite 文件。
-- 记录中浮点列尚未解码，遇到时返回明确错误而不是给出错误数值。
-- 溢出页（记录正文跨页）暂不支持。
 - 不做瓦片渲染、投影变换与矢量瓦片内容解码。
 
 ## 许可

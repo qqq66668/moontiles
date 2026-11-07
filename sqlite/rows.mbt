@@ -2,8 +2,7 @@
 /// 从指定根页遍历一张表，按页序返回全部行的记录正文。
 ///
 /// 支持内部页（类型 5）与叶子页（类型 13）的递归；深度上限 32，超出报错。
-///
-/// 单页内的记录正文必须完整落在本页，溢出页的续页暂不支持。
+/// 记录正文超出单页时按溢出页链拼接。
 pub fn read_table_rows(
   data : Bytes,
   db : DbHeader,
@@ -41,11 +40,21 @@ pub fn read_table_rows(
       let mut i = 0
       while i < pointers.length() {
         let cell = match
-          parse_table_cell(data, page_start, pointers[i], page_end) {
+          parse_table_cell(
+            data,
+            page_start,
+            pointers[i],
+            page_end,
+            db.page_size - db.reserved_bytes,
+          ) {
           Ok(c) => c
           Err(msg) => return Err(msg)
         }
-        rows.push(cell_payload(data, cell))
+        let payload = match read_cell_payload(data, db, cell) {
+          Ok(b) => b
+          Err(msg) => return Err(msg)
+        }
+        rows.push(payload)
         i = i + 1
       }
     } else if header.page_type == 5 {
